@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Library.API.Services;
+using Library.API.Models;
+using Library.API.Helpers;
+using AutoMapper;
 
 namespace Library.API.Controllers
 {
     [Route("api/authors")]
-    public class AuthorsController: Controller
+    public class AuthorsController : Controller
     {
         private ILibraryRepository _libraryRepository;
 
@@ -22,7 +25,21 @@ namespace Library.API.Controllers
         public IActionResult GetAuthors()
         {
             var authorsFromRepo = _libraryRepository.GetAuthors();
-            return new JsonResult(authorsFromRepo);
+            var authors = Mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo);
+            return Ok(authors);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetAuthors(Guid id)
+        {
+            var authorsFromRepo = _libraryRepository.GetAuthor(id);
+            if (authorsFromRepo == null)
+            {
+                return NotFound();
+            }
+            var authors = Mapper.Map<AuthorDto>(authorsFromRepo);
+            return Ok(authors);
         }
     }
+
 }
