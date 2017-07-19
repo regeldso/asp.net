@@ -35,6 +35,7 @@ namespace Library.API
                 {
                     setupAction.ReturnHttpNotAcceptable = true;
                     setupAction.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
+                    setupAction.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
                 }
             );
 
@@ -84,6 +85,8 @@ namespace Library.API
                     cfg.CreateMap<Models.AuthorForCreationDto, Entities.Author>();
 
                     cfg.CreateMap<Models.BookForCreationDto, Entities.Book>();
+
+                    cfg.CreateMap<Models.BookForUpdateDto, Entities.Book>();
                 }
             );
             libraryContext.EnsureSeedDataForContext();

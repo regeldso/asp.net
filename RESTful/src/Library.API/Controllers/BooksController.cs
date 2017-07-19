@@ -45,7 +45,7 @@ namespace Library.API.Controllers
             {
                 NotFound();
             }
-            var booksForAuthor = AutoMapper.Mapper.Map<IEnumerable<BookDto>>(booksForAuthorFromRepo);
+            var booksForAuthor = AutoMapper.Mapper.Map<BookDto>(booksForAuthorFromRepo);
             return Ok(booksForAuthor);
         }
 
@@ -75,5 +75,55 @@ namespace Library.API.Controllers
                 new { authorId = authorId, id = bookToReturn.Id }, 
                 bookToReturn);
        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBookForAuthor(Guid authorId, Guid id)
+        {
+            if (!_libraryRepository.AuthorExists(authorId))
+            {
+                NotFound();
+            }
+
+            var booksForAuthorFromRepo = _libraryRepository.GetBookForAuthor(authorId, id);
+            if (booksForAuthorFromRepo == null)
+            {
+                return NotFound();
+            }
+            _libraryRepository.DeleteBook(booksForAuthorFromRepo);
+            if (!_libraryRepository.Save())
+            {
+                throw new Exception($"Deleting book {id} for author {authorId} failed on saving");
+            }
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBookForAuthor(Guid authorId, Guid id,
+            [FromBody] BookForUpdateDto book)
+        {
+            if (book == null)
+            {
+                return BadRequest();
+            }
+            if (!_libraryRepository.AuthorExists(authorId))
+            {
+                NotFound();
+            }
+
+            var bookForAuthorFromRepo = _libraryRepository.GetBookForAuthor(authorId, id);
+            if (bookForAuthorFromRepo == null)
+            {
+                return NotFound();
+            }
+
+            Mapper.Map(book, bookForAuthorFromRepo);
+
+            _libraryRepository.UpdateBookForAuthor(bookForAuthorFromRepo);
+
+            if (!_libraryRepository.Save())
+            {
+                throw new Exception($"Updating book {id} for author {authorId} failed on save");
+            }
+            return NoContent();
+        }
     }
 }
