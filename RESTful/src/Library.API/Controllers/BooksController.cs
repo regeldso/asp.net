@@ -58,7 +58,8 @@ namespace Library.API.Controllers
 
             if (book.Description == book.Title)
             {
-                ModelState.AddModelError(nameof(BookForCreationDto), "The provided description should be different from the title.");
+                ModelState.AddModelError(nameof(BookForCreationDto),
+                    "The provided description should be different from the title.");
             }
 
             if (!ModelState.IsValid)
@@ -113,6 +114,18 @@ namespace Library.API.Controllers
             {
                 return BadRequest();
             }
+
+            if (book.Description == book.Title)
+            {
+                ModelState.AddModelError(nameof(BookForCreationDto),
+                    "The provided description should be different from the title.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
             if (!_libraryRepository.AuthorExists(authorId))
             {
                 NotFound();
